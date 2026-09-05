@@ -1,0 +1,16 @@
+{
+  "name": "Krishna Enterprises",
+  "short_name": "Krishna Grocery",
+  "description": "Order fresh groceries and daily essentials in Madhuban, Bihar",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

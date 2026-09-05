@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.pem
+serviceAccountKey.json
+config/serviceAccountKey.json
+*serviceAccountKey*.json
+uploads/

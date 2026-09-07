@@ -1,4 +1,4 @@
-﻿/**
+/**
  * routes/product.routes.js
  */
 
@@ -28,6 +28,7 @@ router.get('/:slug', getProductBySlug);
 
 // Admin routes - static before parameterised
 router.get('/admin/low-stock', protect, adminOnly, getLowStockProducts);
+router.get('/admin/:slug', protect, adminOnly, getProductBySlug);
 router.post('/admin/bulk-action', protect, adminOnly, bulkUpdateProducts);
 router.post('/admin', protect, adminOnly, upload.array('images', 5), createProduct);
 router.put('/admin/:id', protect, adminOnly, upload.array('images', 5), updateProduct);

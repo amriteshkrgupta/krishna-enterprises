@@ -26,15 +26,19 @@ export const firebaseConfig = {
   measurementId:     process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID     || 'G-KMMTNSVFZS',
 };
 
+import { getStorage } from 'firebase/storage';
+
 // Prevent re-initialization in Next.js hot reloads
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const firebaseAuth = getAuth(app);
+const firebaseStorage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 export {
   app,
   firebaseAuth,
+  firebaseStorage,
   googleProvider,
   signInWithPopup,
   signInWithEmailAndPassword,

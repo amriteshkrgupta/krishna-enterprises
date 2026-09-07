@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -41,10 +41,12 @@ export default function NewProductPage() {
     register,
     handleSubmit,
     control,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { isActive: true, featured: false, images: [] },
+    defaultValues: { isActive: true, featured: false, images: [], unit: '1 kg' },
   });
 
   const createMut = useMutation({
@@ -111,16 +113,47 @@ export default function NewProductPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Unit / Packaging *</label>
-              <select {...register('unit')} className={inputCls}>
-                <option value="kg">kg (Kilogram)</option>
-                <option value="g">g (Gram)</option>
-                <option value="L">L (Litre)</option>
-                <option value="ml">ml (Millilitre)</option>
-                <option value="piece">piece (Single Item)</option>
-                <option value="pack">pack (Packet / Box)</option>
-                <option value="dozen">dozen (12 pcs)</option>
-              </select>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-bold text-gray-700">Unit / Packaging *</label>
+                <span className="text-[10px] text-gray-400">Type or select suggestion</span>
+              </div>
+              <input
+                type="text"
+                list="unit-suggestions"
+                placeholder="e.g. 25 Kg, 500 g, 1 L, Pack of 6, piece"
+                {...register('unit')}
+                className={inputCls}
+              />
+              <datalist id="unit-suggestions">
+                <option value="25 Kg" />
+                <option value="10 Kg" />
+                <option value="5 Kg" />
+                <option value="1 kg" />
+                <option value="500 g" />
+                <option value="250 g" />
+                <option value="100 g" />
+                <option value="1 L" />
+                <option value="500 ml" />
+                <option value="1 piece" />
+                <option value="1 pack" />
+                <option value="Pack of 6" />
+                <option value="1 dozen (12 pcs)" />
+              </datalist>
+
+              {/* Quick suggestion pills */}
+              <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                {['25 Kg', '5 Kg', '1 kg', '500 g', '1 L', '500 ml', '1 piece', '1 pack'].map((sug) => (
+                  <button
+                    key={sug}
+                    type="button"
+                    onClick={() => setValue('unit', sug, { shouldValidate: true })}
+                    className="rounded-lg bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600 hover:bg-green-100 hover:text-green-800 transition"
+                  >
+                    {sug}
+                  </button>
+                ))}
+              </div>
+              {errors.unit && <p className="mt-1 text-xs text-red-500">{errors.unit.message}</p>}
             </div>
           </div>
 

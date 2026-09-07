@@ -40,7 +40,7 @@ export default function EditProductPage() {
 
   const { data: productData, isLoading } = useQuery({
     queryKey: ['admin', 'product', params.id],
-    queryFn: () => apiGet<ApiResponse<Product>>(`/admin/products/${params.id}`),
+    queryFn: () => apiGet<ApiResponse<Product>>(`/products/${params.id}`),
     enabled: !!params.id,
   });
 
@@ -51,6 +51,7 @@ export default function EditProductPage() {
     handleSubmit,
     control,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -78,12 +79,12 @@ export default function EditProductPage() {
 
   const updateMut = useMutation({
     mutationFn: (payload: FormValues) =>
-      apiPut<ApiResponse<Product>>(`/admin/products/${params.id}`, {
+      apiPut<ApiResponse<Product>>(`/products/admin/${params.id}`, {
         ...payload,
         tags: payload.tags ? payload.tags.split(',').map((t) => t.trim()) : [],
       }),
     onSuccess: () => {
-      toast.success('Product updated!');
+      toast.success('Product updated successfully!');
       qc.invalidateQueries({ queryKey: ['admin', 'products'] });
       qc.invalidateQueries({ queryKey: ['product', product?.slug] });
       router.push('/admin/products');
@@ -129,8 +130,46 @@ export default function EditProductPage() {
               {errors.category && <p className="mt-1 text-xs text-red-500">{errors.category.message}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Unit *</label>
-              <input {...register('unit')} className={inputCls} />
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium text-gray-700">Unit / Packaging *</label>
+                <span className="text-[10px] text-gray-400">Type or select suggestion</span>
+              </div>
+              <input
+                type="text"
+                list="edit-unit-suggestions"
+                placeholder="e.g. 25 Kg, 500 g, 1 L, Pack of 6"
+                {...register('unit')}
+                className={inputCls}
+              />
+              <datalist id="edit-unit-suggestions">
+                <option value="25 Kg" />
+                <option value="10 Kg" />
+                <option value="5 Kg" />
+                <option value="1 kg" />
+                <option value="500 g" />
+                <option value="250 g" />
+                <option value="100 g" />
+                <option value="1 L" />
+                <option value="500 ml" />
+                <option value="1 piece" />
+                <option value="1 pack" />
+                <option value="Pack of 6" />
+                <option value="1 dozen (12 pcs)" />
+              </datalist>
+
+              {/* Quick suggestion pills */}
+              <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                {['25 Kg', '5 Kg', '1 kg', '500 g', '1 L', '500 ml', '1 piece', '1 pack'].map((sug) => (
+                  <button
+                    key={sug}
+                    type="button"
+                    onClick={() => setValue('unit', sug, { shouldValidate: true })}
+                    className="rounded-lg bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600 hover:bg-green-100 hover:text-green-800 transition"
+                  >
+                    {sug}
+                  </button>
+                ))}
+              </div>
               {errors.unit && <p className="mt-1 text-xs text-red-500">{errors.unit.message}</p>}
             </div>
           </div>

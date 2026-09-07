@@ -198,9 +198,13 @@ const createProduct = asyncHandler(async (req, res) => {
   }
   const catData = catDoc.data();
 
-  const images = req.files && req.files.length > 0
-    ? req.files.map((f) => f.location || `/uploads/${f.filename}`)
-    : [];
+  // Accept images from multipart upload OR direct URLs array in JSON body
+  let images = [];
+  if (req.files && req.files.length > 0) {
+    images = req.files.map((f) => f.location || `/uploads/${f.filename}`);
+  } else if (req.body.images && Array.isArray(req.body.images)) {
+    images = req.body.images.filter(Boolean);
+  }
 
   const now = new Date().toISOString();
   const slug = slugify(name);
@@ -266,6 +270,8 @@ const updateProduct = asyncHandler(async (req, res) => {
   if (req.files && req.files.length > 0) {
     const existingImages = snap.data().images || [];
     updates.images = [...existingImages, ...req.files.map((f) => f.location || `/uploads/${f.filename}`)];
+  } else if (req.body.images && Array.isArray(req.body.images)) {
+    updates.images = req.body.images.filter(Boolean);
   }
 
   await ref.update(updates);

@@ -76,7 +76,24 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// --- Health Check -----------------------------------------------------------
+// --- Root & Health Check ---------------------------------------------------
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Welcome to Krishna Enterprises API',
+    storefront: process.env.FRONTEND_URL || 'http://localhost:3000',
+    adminDashboard: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin`,
+    health: '/api/health',
+    endpoints: {
+      products: '/api/products',
+      categories: '/api/categories',
+      cart: '/api/cart',
+      orders: '/api/orders',
+      auth: '/api/auth',
+    },
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',

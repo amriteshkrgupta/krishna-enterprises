@@ -1,7 +1,7 @@
-﻿'use client';
+'use client';
 
 import React, { useRef, useEffect } from 'react';
-import { Printer, X, Leaf, ArrowLeft, Download, ShieldCheck } from 'lucide-react';
+import { X, Leaf, ArrowLeft, Download, ShieldCheck } from 'lucide-react';
 import { formatPrice, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
@@ -44,14 +44,6 @@ export default function InvoiceModal({ isOpen, onClose, order }: InvoiceModalPro
 
   const transactionId = order.transaction_id || order.upiTransactionId || null;
   const isPaid = order.paymentStatus === 'paid' || Boolean(transactionId);
-
-  const handlePrint = () => {
-    try {
-      window.print();
-    } catch {
-      toast.error('Could not open print dialog. Use Download File.');
-    }
-  };
 
   const handleDownloadFile = () => {
     try {
@@ -221,15 +213,9 @@ export default function InvoiceModal({ isOpen, onClose, order }: InvoiceModalPro
           <div className="flex items-center gap-2">
             <button
               onClick={handleDownloadFile}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-green-600 bg-green-50 px-3.5 py-2 text-xs font-extrabold text-green-700 hover:bg-green-100 transition-colors"
-            >
-              <Download className="h-4 w-4" /> Download File
-            </button>
-            <button
-              onClick={handlePrint}
               className="inline-flex items-center gap-1.5 rounded-xl bg-green-600 px-4 py-2 text-xs font-extrabold text-white shadow-md hover:bg-green-700 transition-colors"
             >
-              <Printer className="h-4 w-4" /> Save as PDF (1 Page)
+              <Download className="h-4 w-4" /> Download Invoice
             </button>
             <button
               onClick={onClose}
@@ -373,15 +359,9 @@ export default function InvoiceModal({ isOpen, onClose, order }: InvoiceModalPro
           <div className="flex items-center gap-2">
             <button
               onClick={handleDownloadFile}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-green-600 bg-green-50 px-3.5 py-2 text-xs font-extrabold text-green-700 hover:bg-green-100 transition-colors"
-            >
-              <Download className="h-4 w-4" /> Download File
-            </button>
-            <button
-              onClick={handlePrint}
               className="inline-flex items-center gap-1.5 rounded-xl bg-green-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-md hover:bg-green-700 transition-colors"
             >
-              <Printer className="h-4 w-4" /> Save as PDF (1 Page)
+              <Download className="h-4 w-4" /> Download Invoice
             </button>
           </div>
         </div>

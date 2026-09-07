@@ -23,6 +23,7 @@ const userResponse = (uid, userData, token) => ({
     name: userData.name,
     email: userData.email,
     phone: userData.phone || null,
+    avatar: userData.avatar || null,
     role: userData.role || 'customer',
     addresses: userData.addresses || [],
     createdAt: userData.createdAt,
@@ -113,14 +114,18 @@ const login = asyncHandler(async (req, res) => {
 
   if (!userDoc.exists) {
     const now = new Date().toISOString();
+    const email = (decoded.email || `${decoded.uid}@krishnaenterprises.in`).toLowerCase().trim();
+    const isAdmin = email === 'help.amriteshkumar@gmail.com';
+    const name = decoded.name || 'Customer';
+    const avatar = decoded.picture || null;
     const phone = decoded.phone_number || null;
-    const name = decoded.name || (phone ? `Customer (${phone.slice(-4)})` : 'Customer');
-    const email = decoded.email || `${(phone || decoded.uid).replace(/\D/g, '')}@krishnaenterprises.in`;
+
     userData = {
       name,
       email,
       phone,
-      role: 'customer',
+      avatar,
+      role: isAdmin ? 'admin' : 'customer',
       addresses: [],
       createdAt: now,
       updatedAt: now,
@@ -128,9 +133,19 @@ const login = asyncHandler(async (req, res) => {
     await db.collection('users').doc(decoded.uid).set(userData);
   } else {
     userData = userDoc.data();
-    if (!userData.phone && decoded.phone_number) {
-      userData.phone = decoded.phone_number;
-      await db.collection('users').doc(decoded.uid).update({ phone: decoded.phone_number });
+    const updates = {};
+    if (!userData.avatar && decoded.picture) {
+      updates.avatar = decoded.picture;
+    }
+    if ((!userData.name || userData.name === 'Customer') && decoded.name) {
+      updates.name = decoded.name;
+    }
+    if (decoded.email && decoded.email.toLowerCase().trim() === 'help.amriteshkumar@gmail.com' && userData.role !== 'admin') {
+      updates.role = 'admin';
+    }
+    if (Object.keys(updates).length > 0) {
+      await db.collection('users').doc(decoded.uid).update(updates);
+      userData = { ...userData, ...updates };
     }
   }
 

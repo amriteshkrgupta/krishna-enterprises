@@ -9,12 +9,11 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPhoneNumber,
-  RecaptchaVerifier,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
   type User as FirebaseUser,
-  type ConfirmationResult,
 } from 'firebase/auth';
 
 export const firebaseConfig = {
@@ -30,18 +29,19 @@ export const firebaseConfig = {
 // Prevent re-initialization in Next.js hot reloads
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const firebaseAuth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 export {
   app,
   firebaseAuth,
+  googleProvider,
+  signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPhoneNumber,
-  RecaptchaVerifier,
   signOut,
   onAuthStateChanged,
   type FirebaseUser,
-  type ConfirmationResult,
 };
 
 export default firebaseConfig;

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * utils/seed.js
  * Seeds Firestore with categories, products, and admin user.
  * Run: node utils/seed.js
@@ -74,8 +74,8 @@ const seedDB = async () => {
 
     // Create admin user in Firebase Auth + Firestore
     console.log('Creating admin user...');
-    const adminEmail = 'admin@krishnaenterprises.com';
-    const adminPassword = 'Admin@123';
+    const adminEmail = 'help.amriteshkumar@gmail.com';
+    const adminPassword = 'hsetirma*';
     let adminUid = 'admin_default_uid';
 
     try {

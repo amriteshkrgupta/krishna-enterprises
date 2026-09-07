@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -90,7 +90,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <ArrowLeft className="h-3.5 w-3.5" /> Back to Storefront
         </Link>
         <div className="pt-2">
-          <p className="text-[11px] font-mono text-slate-400 truncate">{user?.email || 'admin@krishnaenterprises.com'}</p>
+          <p className="text-[11px] font-mono text-slate-400 truncate">{user?.email || 'help.amriteshkumar@gmail.com'}</p>
           <button
             onClick={handleLogout}
             className="mt-1 flex w-full items-center gap-1.5 rounded-lg text-xs font-bold text-red-400 hover:text-red-300 transition-colors"

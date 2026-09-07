@@ -48,31 +48,55 @@ const getProducts = asyncHandler(async (req, res) => {
   let products = snap.docs.map(docToProduct);
 
   if (category) {
-    products = products.filter((p) => p.categorySlug === category || p.categoryId === category);
+    const catLower = category.toLowerCase().trim();
+    products = products.filter(
+      (p) =>
+        (p.categorySlug && p.categorySlug.toLowerCase() === catLower) ||
+        (p.categoryId && p.categoryId.toLowerCase() === catLower) ||
+        (p.categoryName && p.categoryName.toLowerCase() === catLower) ||
+        (p.catName && p.catName.toLowerCase() === catLower)
+    );
   }
 
-  if (inStock === 'true') products = products.filter((p) => p.stock > 0);
-  if (featured === 'true') products = products.filter((p) => p.featured === true);
+  if (inStock === 'true' || inStock === true) products = products.filter((p) => p.stock > 0);
+  if (featured === 'true' || featured === true) products = products.filter((p) => p.featured === true);
 
   if (search) {
     const q = search.toLowerCase().trim();
     products = products.filter(
       (p) =>
-        p.name.toLowerCase().includes(q) ||
-        (p.description || '').toLowerCase().includes(q) ||
-        (p.slug || '').toLowerCase().includes(q) ||
-        (p.tags || []).some((t) => t.toLowerCase().includes(q))
+        (p.name && p.name.toLowerCase().includes(q)) ||
+        (p.description && p.description.toLowerCase().includes(q)) ||
+        (p.slug && p.slug.toLowerCase().includes(q)) ||
+        (p.categoryName && p.categoryName.toLowerCase().includes(q)) ||
+        (p.catName && p.catName.toLowerCase().includes(q)) ||
+        (p.tags && p.tags.some((t) => t.toLowerCase().includes(q)))
     );
   }
 
-  if (minPrice) products = products.filter((p) => p.price >= Number(minPrice));
-  if (maxPrice) products = products.filter((p) => p.price <= Number(maxPrice));
+  if (minPrice !== undefined && minPrice !== '') {
+    const min = Number(minPrice);
+    if (!isNaN(min)) {
+      products = products.filter((p) => (p.discountPrice != null ? p.discountPrice : p.price) >= min);
+    }
+  }
+  if (maxPrice !== undefined && maxPrice !== '') {
+    const max = Number(maxPrice);
+    if (!isNaN(max)) {
+      products = products.filter((p) => (p.discountPrice != null ? p.discountPrice : p.price) <= max);
+    }
+  }
 
-  // In-memory sorting
-  if (sort === 'price-asc') {
-    products.sort((a, b) => a.price - b.price);
-  } else if (sort === 'price-desc') {
-    products.sort((a, b) => b.price - a.price);
+  // In-memory sorting (supports both underscore and hyphen keys)
+  const s = (sort || 'newest').toLowerCase().trim();
+  if (s === 'price-asc' || s === 'price_asc') {
+    products.sort((a, b) => (a.discountPrice != null ? a.discountPrice : a.price) - (b.discountPrice != null ? b.discountPrice : b.price));
+  } else if (s === 'price-desc' || s === 'price_desc') {
+    products.sort((a, b) => (b.discountPrice != null ? b.discountPrice : b.price) - (a.discountPrice != null ? a.discountPrice : a.price));
+  } else if (s === 'name-asc' || s === 'name_asc') {
+    products.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  } else if (s === 'name-desc' || s === 'name_desc') {
+    products.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
   } else {
     products.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
   }

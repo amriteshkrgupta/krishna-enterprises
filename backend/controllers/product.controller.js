@@ -218,7 +218,7 @@ const createProduct = asyncHandler(async (req, res) => {
     categorySlug: catData.slug || '',
     price: Number(price),
     discountPrice: discountPrice ? Number(discountPrice) : null,
-    images: images.length > 0 ? images : ['https://via.placeholder.com/400x400?text=Product'],
+    images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80'],
     stock: Number(stock),
     unit: unit || 'piece',
     tags: tags ? (Array.isArray(tags) ? tags : tags.split(',').map((t) => t.trim())) : [],

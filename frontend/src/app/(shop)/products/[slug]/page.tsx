@@ -65,8 +65,11 @@ export default function ProductDetailPage() {
   const categoryName =
     typeof product.category !== 'string' ? product.category?.name : 'Groceries';
 
-  const images = product.images?.length > 0
-    ? product.images
+  const rawImages = (product.images || []).filter(
+    (img: string) => img && !img.includes('via.placeholder.com'),
+  );
+  const images = rawImages.length > 0
+    ? rawImages
     : ['https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80'];
 
   const hasDiscount = Boolean(product.discountPrice && product.discountPrice < product.price);
@@ -109,6 +112,9 @@ export default function ProductDetailPage() {
               src={images[activeImg] || images[0]}
               alt={product.name}
               className="h-full w-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80';
+              }}
             />
             {hasDiscount && (
               <span className="absolute left-4 top-4 rounded-xl bg-orange-500 px-3 py-1 text-xs font-extrabold text-white shadow-md">

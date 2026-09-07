@@ -198,13 +198,13 @@ export default function ImageUpload({ value = [], onChange, maxImages = 5 }: Ima
               key={url + i}
               className="group relative aspect-square overflow-hidden rounded-xl bg-gray-100 border border-gray-200 shadow-2xs"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={url}
                 alt={`Upload ${i + 1}`}
+                referrerPolicy="no-referrer"
                 className="h-full w-full object-cover"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x400?text=Invalid+Image';
+                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&q=80';
                 }}
               />
               <button

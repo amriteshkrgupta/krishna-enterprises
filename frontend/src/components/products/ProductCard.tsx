@@ -91,12 +91,16 @@ function ProductCardComponent({ product }: ProductCardProps) {
               <img
                 src={product.images[0]}
                 alt={product.name}
+                referrerPolicy="no-referrer"
                 loading="lazy"
                 decoding="async"
                 className={cn(
                   'h-full w-full object-cover transition-transform duration-300 group-hover:scale-105',
                   isOutOfStock && 'opacity-60 grayscale',
                 )}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&q=80';
+                }}
               />
             ) : (
               <span className="text-4xl">🛒</span>

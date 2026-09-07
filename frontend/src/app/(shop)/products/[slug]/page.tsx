@@ -111,6 +111,7 @@ export default function ProductDetailPage() {
             <img
               src={images[activeImg] || images[0]}
               alt={product.name}
+              referrerPolicy="no-referrer"
               className="h-full w-full object-cover"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80';
@@ -134,7 +135,7 @@ export default function ProductDetailPage() {
                     activeImg === idx ? 'border-green-600 ring-2 ring-green-600/20' : 'border-gray-200 hover:border-gray-300',
                   )}
                 >
-                  <img src={img} alt="" className="h-full w-full object-cover" />
+                  <img src={img} alt="" referrerPolicy="no-referrer" className="h-full w-full object-cover" />
                 </button>
               ))}
             </div>

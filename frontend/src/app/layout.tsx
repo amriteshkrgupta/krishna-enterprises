@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     'Order fresh groceries, atta, rice, dal, oil and daily essentials online from Krishna Enterprises, Machhaha Chowk, Madhuban, East Champaran, Bihar 845420. Fast home delivery, best prices, COD & UPI.',
   keywords: 'grocery, online grocery, Madhuban, East Champaran, Bihar, Machhaha Chowk, fresh groceries, daily essentials',
   manifest: '/manifest.json',
+  referrer: 'no-referrer-when-downgrade',
   openGraph: {
     title: 'Krishna Enterprises | Fresh Groceries Delivered Fast',
     description: 'Fresh groceries, daily essentials, and household items delivered right to your door in Madhuban, Bihar.',

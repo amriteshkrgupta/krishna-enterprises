@@ -224,13 +224,14 @@ function NavbarComponent() {
             <div className="relative" ref={dropRef}>
               <button
                 onClick={() => setUserDropOpen((o) => !o)}
-                className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 hover:bg-gray-50 shadow-2xs transition-colors"
+                className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white p-1 pr-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 shadow-2xs transition-colors"
+                aria-label="User profile menu"
+                title={user.name}
               >
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-green-100 text-green-700 font-bold text-xs">
-                  {user.name.charAt(0).toUpperCase()}
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-white font-bold text-xs shadow-xs">
+                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                 </div>
-                <span className="max-w-[90px] truncate text-xs font-bold hidden sm:inline">{user.name}</span>
-                <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
+                <ChevronDown className="h-3.5 w-3.5 text-gray-500" />
               </button>
 
               {userDropOpen && (

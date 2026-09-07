@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Filter, X, ChevronDown, ChevronUp, Search, RotateCcw } from 'lucide-react';
+import { Filter, X, ChevronDown, ChevronUp, Search, RotateCcw, Tag } from 'lucide-react';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import ProductGrid from '@/components/products/ProductGrid';
 import { cn } from '@/lib/utils';
@@ -14,7 +14,15 @@ const SORT_OPTIONS = [
   { value: 'name_asc', label: 'Name A to Z' },
 ];
 
-export default function ProductsPage() {
+const PRICE_PRESETS = [
+  { label: 'All', min: undefined, max: undefined },
+  { label: 'Under ₹50', min: undefined, max: 50 },
+  { label: '₹50 - ₹100', min: 50, max: 100 },
+  { label: '₹100 - ₹200', min: 100, max: 200 },
+  { label: 'Above ₹200', min: 200, max: undefined },
+];
+
+function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -81,6 +89,21 @@ export default function ProductsPage() {
     });
   };
 
+  const applyPricePreset = (min?: number, max?: number) => {
+    setLocalMin(min !== undefined ? min.toString() : '');
+    setLocalMax(max !== undefined ? max.toString() : '');
+    updateParams({
+      minPrice: min !== undefined ? min.toString() : undefined,
+      maxPrice: max !== undefined ? max.toString() : undefined,
+    });
+  };
+
+  const isPresetActive = (min?: number, max?: number) => {
+    const curMin = minPrice ? Number(minPrice) : undefined;
+    const curMax = maxPrice ? Number(maxPrice) : undefined;
+    return curMin === min && curMax === max;
+  };
+
   const clearAllFilters = () => {
     setLocalSearch('');
     setLocalMin('');
@@ -90,9 +113,24 @@ export default function ProductsPage() {
 
   const activeFilters: { label: string; remove: () => void }[] = [];
   if (search) activeFilters.push({ label: `"${search}"`, remove: () => updateParams({ search: undefined }) });
-  if (category) activeFilters.push({ label: `Category: ${category}`, remove: () => updateParams({ category: undefined }) });
-  if (minPrice) activeFilters.push({ label: `Min ₹${minPrice}`, remove: () => updateParams({ minPrice: undefined }) });
-  if (maxPrice) activeFilters.push({ label: `Max ₹${maxPrice}`, remove: () => updateParams({ maxPrice: undefined }) });
+  if (category) {
+    const catName = categories.find((c) => c.slug === category)?.name || category;
+    activeFilters.push({ label: `Category: ${catName}`, remove: () => updateParams({ category: undefined }) });
+  }
+  if (minPrice || maxPrice) {
+    let priceLabel = 'Price: ';
+    if (minPrice && maxPrice) priceLabel += `₹${minPrice} - ₹${maxPrice}`;
+    else if (minPrice) priceLabel += `Min ₹${minPrice}`;
+    else if (maxPrice) priceLabel += `Under ₹${maxPrice}`;
+    activeFilters.push({
+      label: priceLabel,
+      remove: () => {
+        setLocalMin('');
+        setLocalMax('');
+        updateParams({ minPrice: undefined, maxPrice: undefined });
+      },
+    });
+  }
   if (inStock) activeFilters.push({ label: 'In Stock Only', remove: () => updateParams({ inStock: undefined }) });
 
   return (
@@ -150,7 +188,7 @@ export default function ProductsPage() {
       </div>
 
       {/* Mobile Horizontal Quick-Category Pills */}
-      <div className="mb-4 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none md:hidden">
+      <div className="mb-2.5 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none md:hidden">
         <button
           onClick={() => updateParams({ category: undefined })}
           className={cn(
@@ -174,6 +212,27 @@ export default function ProductsPage() {
             )}
           >
             {c.name}
+          </button>
+        ))}
+      </div>
+
+      {/* Mobile Horizontal Quick-Price Pills */}
+      <div className="mb-4 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none md:hidden">
+        <span className="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider shrink-0 flex items-center gap-1">
+          <Tag className="h-3 w-3 text-green-600" /> Price:
+        </span>
+        {PRICE_PRESETS.map((p, idx) => (
+          <button
+            key={idx}
+            onClick={() => applyPricePreset(p.min, p.max)}
+            className={cn(
+              'shrink-0 rounded-full px-3 py-1 text-xs font-bold transition-all shadow-2xs',
+              isPresetActive(p.min, p.max)
+                ? 'bg-green-700 text-white shadow-sm'
+                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50',
+            )}
+          >
+            {p.label}
           </button>
         ))}
       </div>
@@ -255,6 +314,24 @@ export default function ProductsPage() {
             {/* Price Filter */}
             <div>
               <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Price (₹)</h3>
+              {/* Presets */}
+              <div className="grid grid-cols-2 gap-1.5 mb-3">
+                {PRICE_PRESETS.map((p, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => applyPricePreset(p.min, p.max)}
+                    className={cn(
+                      'rounded-lg px-2 py-1.5 text-xs font-bold transition-all text-center',
+                      isPresetActive(p.min, p.max)
+                        ? 'bg-green-600 text-white shadow-xs'
+                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200/60',
+                    )}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
               <form onSubmit={handlePriceApply} className="space-y-2">
                 <div className="flex items-center gap-2">
                   <input
@@ -416,6 +493,26 @@ export default function ProductsPage() {
               {/* Price Filter */}
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Price Range (₹)</h3>
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  {PRICE_PRESETS.map((p, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => {
+                        applyPricePreset(p.min, p.max);
+                        setSidebarOpen(false);
+                      }}
+                      className={cn(
+                        'rounded-xl px-2.5 py-2 text-xs font-bold transition-all text-center',
+                        isPresetActive(p.min, p.max)
+                          ? 'bg-green-600 text-white shadow-xs'
+                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200/60',
+                      )}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
                 <form
                   onSubmit={(e) => {
                     handlePriceApply(e);
@@ -489,5 +586,13 @@ export default function ProductsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="mx-auto max-w-7xl px-4 py-16 text-center"><div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-green-600 border-r-transparent" /><p className="mt-3 text-sm font-semibold text-gray-500">Loading products catalog...</p></div>}>
+      <ProductsContent />
+    </Suspense>
   );
 }

@@ -37,3 +37,5 @@ Thumbs.db
 *serviceAccountKey*.json
 serviceAccountKey.json
 backend/config/serviceAccountKey.json
+scratch/
+

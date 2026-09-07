@@ -1,4 +1,4 @@
-﻿// ── All shared TypeScript interfaces for Krishna Enterprises ──────────────────
+// ── All shared TypeScript interfaces for Krishna Enterprises ──────────────────
 
 export interface Address {
   _id?: string;
@@ -127,3 +127,83 @@ export interface ProductsResponse {
   page: number;
   pages: number;
 }
+
+// ── CMS Dynamic Homepage Types ─────────────────────────────────────────────
+
+export type HomepageSectionType =
+  | 'hero'
+  | 'category_grid'
+  | 'product_section'
+  | 'trust_strip'
+  | 'store_location'
+  | 'promotional_banner'
+  | 'announcement_bar';
+
+export type ProductDataSourceType = 'featured' | 'all' | 'category' | 'manual';
+
+export interface ProductDataSource {
+  type: ProductDataSourceType;
+  limit?: number;
+  categorySlug?: string;
+  categoryName?: string;
+  productIds?: string[];
+}
+
+export interface TrustItem {
+  id: string;
+  icon: string;
+  title: string;
+  description: string;
+}
+
+export interface HomepageSection {
+  id: string;
+  type: HomepageSectionType;
+  position: number;
+  enabled: boolean;
+  title?: string;
+  subtitle?: string;
+  badge?: string;
+  startAt?: string | null;
+  endAt?: string | null;
+  dataSource?: ProductDataSource;
+  content?: {
+    ctaPrimaryText?: string;
+    ctaPrimaryLink?: string;
+    ctaSecondaryText?: string;
+    ctaSecondaryLink?: string;
+    seeAllText?: string;
+    seeAllLink?: string;
+    viewAllText?: string;
+    viewAllLink?: string;
+    cardStyle?: string;
+    limit?: number;
+    items?: TrustItem[];
+    phone?: string;
+    callText?: string;
+    whatsappText?: string;
+    imageUrl?: string;
+    targetLink?: string;
+    backgroundColor?: string;
+    textColor?: string;
+    message?: string;
+    linkText?: string;
+  };
+}
+
+export interface HomepageConfig {
+  version: number;
+  updatedAt?: string;
+  isDefault?: boolean;
+  sections: HomepageSection[];
+}
+
+export interface HomepageVersion {
+  id: string;
+  version: number;
+  publishedAt: string;
+  publishedBy?: string;
+  note?: string;
+  sectionsCount: number;
+}
+

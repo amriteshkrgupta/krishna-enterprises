@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Package, Tag, ShoppingBag, Users, Percent,
-  Warehouse, LogOut, Leaf, Menu, X, ArrowLeft,
+  Warehouse, LogOut, Leaf, Menu, X, ArrowLeft, Sliders,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 
 const NAV = [
   { href: '/admin', label: 'Dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
+  { href: '/admin/homepage', label: 'Homepage Builder', icon: <Sliders className="h-4 w-4" /> },
   { href: '/admin/orders', label: 'Orders', icon: <ShoppingBag className="h-4 w-4" /> },
   { href: '/admin/customers', label: 'Customers', icon: <Users className="h-4 w-4" /> },
   { href: '/admin/products', label: 'Products', icon: <Package className="h-4 w-4" /> },

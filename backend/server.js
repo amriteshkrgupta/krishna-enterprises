@@ -23,6 +23,7 @@ const orderRoutes     = require('./routes/order.routes');
 const offerRoutes     = require('./routes/offer.routes');
 const uploadRoutes    = require('./routes/upload.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
+const cmsRoutes       = require('./routes/cms.routes');
 const { errorHandler, notFound } = require('./middleware/error.middleware');
 
 const app = express();
@@ -112,6 +113,7 @@ app.use('/api/orders',           orderRoutes);
 app.use('/api/offers',           offerRoutes);
 app.use('/api/upload',           uploadRoutes);
 app.use('/api/admin/dashboard',  dashboardRoutes);
+app.use('/api/cms',              cmsRoutes);
 
 // --- Error Handling ---------------------------------------------------------
 app.use(notFound);

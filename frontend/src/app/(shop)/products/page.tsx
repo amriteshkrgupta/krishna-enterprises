@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, Suspense } from 'react';
+import { useState, useCallback, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Filter, X, ChevronDown, ChevronUp, Search, RotateCcw, Tag } from 'lucide-react';
 import { useProducts, useCategories } from '@/hooks/useProducts';
@@ -33,7 +33,13 @@ function ProductsContent() {
   const minPrice = searchParams.get('minPrice') ?? '';
   const maxPrice = searchParams.get('maxPrice') ?? '';
   const inStock = searchParams.get('inStock') === 'true';
-  const sort = searchParams.get('sort') ?? 'newest';
+  const sortParam = searchParams.get('sort') ?? 'newest';
+  const [sort, setSort] = useState(sortParam);
+
+  useEffect(() => {
+    setSort(sortParam);
+  }, [sortParam]);
+
   const page = parseInt(searchParams.get('page') ?? '1', 10);
 
   // Local filter state
@@ -63,6 +69,33 @@ function ProductsContent() {
   const totalPages = productsResult?.pages ?? 1;
   const totalCount = productsResult?.total ?? 0;
 
+  // Instant in-memory sort so UI changes immediately without waiting for network or refresh
+  const displayedProducts = useMemo(() => {
+    const list = [...products];
+    const s = (sort || 'newest').toLowerCase();
+    if (s === 'price_asc' || s === 'price-asc') {
+      return list.sort((a, b) => {
+        const pA = a.discountPrice != null && a.discountPrice > 0 ? a.discountPrice : a.price;
+        const pB = b.discountPrice != null && b.discountPrice > 0 ? b.discountPrice : b.price;
+        return pA - pB;
+      });
+    }
+    if (s === 'price_desc' || s === 'price-desc') {
+      return list.sort((a, b) => {
+        const pA = a.discountPrice != null && a.discountPrice > 0 ? a.discountPrice : a.price;
+        const pB = b.discountPrice != null && b.discountPrice > 0 ? b.discountPrice : b.price;
+        return pB - pA;
+      });
+    }
+    if (s === 'name_asc' || s === 'name-asc') {
+      return list.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    }
+    if (s === 'name_desc' || s === 'name-desc') {
+      return list.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+    }
+    return list;
+  }, [products, sort]);
+
   const updateParams = useCallback(
     (updates: Record<string, string | undefined>) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -71,6 +104,9 @@ function ProductsContent() {
         else params.set(k, v);
       });
       params.set('page', '1');
+      if (updates.sort) {
+        setSort(updates.sort);
+      }
       router.push(`/products?${params.toString()}`);
     },
     [searchParams, router],
@@ -146,7 +182,7 @@ function ProductsContent() {
               : 'All Grocery Products'}
           </h1>
           <p className="text-sm text-gray-500">
-            {isLoading ? 'Loading catalog...' : `Showing ${products.length} of ${totalCount} items`}
+            {isLoading ? 'Loading catalog...' : `Showing ${displayedProducts.length} of ${totalCount || displayedProducts.length} items`}
           </p>
         </div>
 
@@ -174,7 +210,11 @@ function ProductsContent() {
             <span className="hidden text-xs font-semibold text-gray-500 sm:inline">Sort:</span>
             <select
               value={sort}
-              onChange={(e) => updateParams({ sort: e.target.value })}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSort(val);
+                updateParams({ sort: val });
+              }}
               className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs sm:text-sm font-bold text-gray-700 shadow-xs focus:border-green-600 focus:outline-none"
             >
               {SORT_OPTIONS.map((opt) => (
@@ -376,7 +416,7 @@ function ProductsContent() {
 
         {/* Products Grid + Pagination */}
         <main className="flex-1">
-          <ProductGrid products={products} isLoading={isLoading} />
+          <ProductGrid products={displayedProducts} isLoading={isLoading} />
 
           {/* Pagination */}
           {totalPages > 1 && (
@@ -579,7 +619,7 @@ function ProductsContent() {
                 onClick={() => setSidebarOpen(false)}
                 className="w-full rounded-xl bg-green-600 py-2.5 text-xs font-extrabold text-white shadow-md hover:bg-green-700 transition-colors"
               >
-                View Results ({products.length})
+                View Results ({displayedProducts.length})
               </button>
             </div>
           </div>

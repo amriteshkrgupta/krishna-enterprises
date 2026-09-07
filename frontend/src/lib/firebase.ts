@@ -1,4 +1,4 @@
-﻿/**
+/**
  * lib/firebase.ts
  * Firebase client SDK initialization.
  * Used for Firebase Auth sign-in on the frontend.
@@ -9,9 +9,12 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInWithPhoneNumber,
+  RecaptchaVerifier,
   signOut,
   onAuthStateChanged,
   type User as FirebaseUser,
+  type ConfirmationResult,
 } from 'firebase/auth';
 
 export const firebaseConfig = {
@@ -33,9 +36,12 @@ export {
   firebaseAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInWithPhoneNumber,
+  RecaptchaVerifier,
   signOut,
   onAuthStateChanged,
   type FirebaseUser,
+  type ConfirmationResult,
 };
 
 export default firebaseConfig;

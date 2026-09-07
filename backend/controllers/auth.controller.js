@@ -1,4 +1,4 @@
-﻿/**
+/**
  * controllers/auth.controller.js
  * Firebase Auth + Firestore user management.
  *
@@ -109,13 +109,30 @@ const login = asyncHandler(async (req, res) => {
   }
 
   const userDoc = await db.collection('users').doc(decoded.uid).get();
+  let userData;
 
   if (!userDoc.exists) {
-    res.status(404);
-    throw new Error('User profile not found. Please register first.');
+    const now = new Date().toISOString();
+    const phone = decoded.phone_number || null;
+    const name = decoded.name || (phone ? `Customer (${phone.slice(-4)})` : 'Customer');
+    const email = decoded.email || `${(phone || decoded.uid).replace(/\D/g, '')}@krishnaenterprises.in`;
+    userData = {
+      name,
+      email,
+      phone,
+      role: 'customer',
+      addresses: [],
+      createdAt: now,
+      updatedAt: now,
+    };
+    await db.collection('users').doc(decoded.uid).set(userData);
+  } else {
+    userData = userDoc.data();
+    if (!userData.phone && decoded.phone_number) {
+      userData.phone = decoded.phone_number;
+      await db.collection('users').doc(decoded.uid).update({ phone: decoded.phone_number });
+    }
   }
-
-  const userData = userDoc.data();
 
   res.json(userResponse(decoded.uid, userData, idToken));
 });
